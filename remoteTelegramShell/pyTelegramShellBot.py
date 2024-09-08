@@ -823,34 +823,6 @@ def savePhoto(doc):
     bot.send_message(doc.chat.id, f"File saved as {file_path}")
 
 
-@bot.message_handler(content_types=['audio', 'voice', 'document'])
-def saveAudio(doc):
-    if not check_user(doc):
-        response = "Audio not saved. Please log in, insert a valid password."
-        bot.send_message(doc.from_user.id, response)
-        return
-
-    if doc.content_type == 'audio':
-        # Handles various audio file formats
-        file_info = bot.get_file(doc.audio.file_id)
-        file_name = doc.audio.file_name if doc.audio.file_name else str(doc.date) + ".mp3"  # Default to .mp3 if no name
-    elif doc.content_type == 'voice':
-        # Handles Telegram's voice message format (.ogg)
-        file_info = bot.get_file(doc.voice.file_id)
-        file_name = str(doc.date) + ".ogg"
-    elif doc.content_type == 'document':
-        # Handles audio files sent as a document (supports all formats like MP3, WAV, M4A, etc.)
-        if doc.document.mime_type.startswith("audio/"):
-            file_info = bot.get_file(doc.document.file_id)
-            file_name = doc.document.file_name if doc.document.file_name else str(doc.date)
-
-    # Download the file
-    downloaded_file = bot.download_file(file_info.file_path)
-    file_path = SHARED_FOLDER + file_name
-    with open(file_path, 'wb') as new_file:
-        new_file.write(downloaded_file)
-    bot.send_message(doc.chat.id, f"Audio file saved as {file_path}")
-
 def main():
     bot.polling(none_stop=True)
 
